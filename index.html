@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>就活サポート 登録フォーム</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #06C755;
+      --primary-dark: #05a948;
+      --bg: #f5f7fa;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text-muted: #6b7280;
+      --border: #e5e7eb;
+      --error: #ef4444;
+      --radius: 12px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    .header {
+      background: linear-gradient(135deg, var(--primary), #00b341);
+      color: #fff;
+      padding: 28px 20px 24px;
+      text-align: center;
+    }
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .header p {
+      font-size: 13px;
+      opacity: 0.85;
+    }
+
+    .form-container {
+      padding: 20px 16px 40px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 14px;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+    .form-group label .required {
+      color: var(--error);
+      font-size: 12px;
+      margin-left: 4px;
+    }
+    .form-group label .optional {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-left: 4px;
+    }
+
+    .form-group input[type="text"],
+    .form-group select {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 16px;
+      font-family: inherit;
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--card);
+      color: var(--text);
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(6, 199, 85, 0.12);
+    }
+    .form-group input.error,
+    .form-group select.error {
+      border-color: var(--error);
+    }
+    .error-msg {
+      color: var(--error);
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+
+    .form-group .hint {
+      font-size: 12px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      background: var(--primary);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: inherit;
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      margin-top: 8px;
+    }
+    .submit-btn:active {
+      transform: scale(0.98);
+      background: var(--primary-dark);
+    }
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .success-screen {
+      display: none;
+      text-align: center;
+      padding: 60px 20px;
+    }
+    .success-screen.show { display: block; }
+    .success-screen .checkmark {
+      width: 72px;
+      height: 72px;
+      background: var(--primary);
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .success-screen .checkmark svg {
+      width: 36px;
+      height: 36px;
+      fill: none;
+      stroke: #fff;
+      stroke-width: 3;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+    .success-screen h2 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+    .success-screen p {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .close-btn {
+      margin-top: 24px;
+      padding: 12px 40px;
+      background: var(--text);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 15px;
+      font-family: inherit;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .loading-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.8);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .loading-overlay.show {
+      display: flex;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loading">
+    <div class="spinner"></div>
+  </div>
+
+  <div id="form-screen">
+    <div class="header">
+      <h1>就活サポート 登録フォーム</h1>
+      <p>以下の情報をご入力ください</p>
+    </div>
+
+    <div class="form-container">
+      <form id="registrationForm" novalidate>
+
+        <div class="form-group">
+          <label>氏名<span class="required">*必須</span></label>
+          <input type="text" id="fullName" placeholder="山田 太郎" required>
+          <div class="error-msg" id="fullName-error">氏名を入力してください</div>
+        </div>
+
+        <div class="form-group">
+          <label>氏名（カタカナ）<span class="required">*必須</span></label>
+          <input type="text" id="fullNameKana" placeholder="ヤマダ タロウ" required>
+          <div class="error-msg" id="fullNameKana-error">カタカナで入力してください</div>
+        </div>
+
+        <div class="form-group">
+          <label>大学名<span class="required">*必須</span></label>
+          <input type="text" id="university" placeholder="例：早稲田大学" required>
+          <div class="error-msg" id="university-error">大学名を入力してください</div>
+        </div>
+
+        <div class="form-group">
+          <label>学部<span class="required">*必須</span></label>
+          <input type="text" id="faculty" placeholder="例：商学部" required>
+          <div class="error-msg" id="faculty-error">学部を入力してください</div>
+        </div>
+
+        <div class="form-group">
+          <label>卒業年度<span class="required">*必須</span></label>
+          <select id="graduationYear" required>
+            <option value="" disabled selected>選択してください</option>
+            <option value="27卒">27卒（2027年3月卒業）</option>
+            <option value="28卒">28卒（2028年3月卒業）</option>
+            <option value="29卒">29卒（2029年3月卒業）</option>
+            <option value="30卒">30卒（2030年3月卒業）</option>
+          </select>
+          <div class="error-msg" id="graduationYear-error">卒業年度を選択してください</div>
+        </div>
+
+        <div class="form-group">
+          <label>招待コード<span class="optional">任意</span></label>
+          <input type="text" id="inviteCode" placeholder="3桁のコード" maxlength="3">
+          <div class="error-msg" id="inviteCode-error">招待コードは3桁で入力してください</div>
+          <div class="hint">紹介者から受け取った3桁のコードがあれば入力</div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn">登録する</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="success-screen" id="success-screen">
+    <div class="checkmark">
+      <svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <h2>登録完了！</h2>
+    <p>ご登録ありがとうございます。<br>あなたに合った就活情報をお届けします。</p>
+    <button class="close-btn" onclick="closeLiff()">閉じる</button>
+  </div>
+
+  <!-- LIFF SDK -->
+  <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+
+  <script>
+    // =====================================================
+    // ★ 設定値（デプロイ時に書き換え）
+    // =====================================================
+    const LIFF_ID       = 'YOUR_LIFF_ID';       // ← LINE DevelopersでLIFF作成後に貼る
+    const GAS_ENDPOINT  = 'YOUR_GAS_ENDPOINT';   // ← GASデプロイ後に貼る
+
+    // =====================================================
+    // LIFF 初期化
+    // =====================================================
+    let userId  = null;
+    let profile = null;
+
+    async function initLiff() {
+      try {
+        await liff.init({ liffId: LIFF_ID });
+
+        if (!liff.isLoggedIn()) {
+          liff.login();
+          return;
+        }
+
+        profile = await liff.getProfile();
+        userId  = profile.userId;
+        console.log('LIFF initialized. userId:', userId);
+      } catch (err) {
+        console.error('LIFF init error:', err);
+        alert('初期化に失敗しました。LINEアプリから開き直してください。');
+      }
+    }
+
+    initLiff();
+
+    // =====================================================
+    // バリデーション
+    // =====================================================
+    function validateField(id, condition) {
+      const el    = document.getElementById(id);
+      const errEl = document.getElementById(id + '-error');
+      if (!condition) {
+        el.classList.add('error');
+        errEl.classList.add('show');
+        return false;
+      }
+      el.classList.remove('error');
+      errEl.classList.remove('show');
+      return true;
+    }
+
+    function validateAll() {
+      const name = document.getElementById('fullName').value.trim();
+      const kana = document.getElementById('fullNameKana').value.trim();
+      const uni  = document.getElementById('university').value.trim();
+      const fac  = document.getElementById('faculty').value.trim();
+      const year = document.getElementById('graduationYear').value;
+      const code = document.getElementById('inviteCode').value.trim();
+
+      const kanaRegex = /^[ァ-ヶー\s　]+$/;
+      const codeRegex = /^[A-Za-z0-9]{3}$/;
+
+      let ok = true;
+      ok = validateField('fullName',       name.length > 0)                    && ok;
+      ok = validateField('fullNameKana',   kanaRegex.test(kana))               && ok;
+      ok = validateField('university',     uni.length > 0)                     && ok;
+      ok = validateField('faculty',        fac.length > 0)                     && ok;
+      ok = validateField('graduationYear', year !== '')                         && ok;
+      ok = validateField('inviteCode',     code === '' || codeRegex.test(code)) && ok;
+
+      return ok;
+    }
+
+    // =====================================================
+    // フォーム送信
+    // =====================================================
+    document.getElementById('registrationForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!validateAll()) return;
+
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = true;
+      document.getElementById('loading').classList.add('show');
+
+      const payload = {
+        lineUserId:     userId,
+        displayName:    profile ? profile.displayName : '',
+        fullName:       document.getElementById('fullName').value.trim(),
+        fullNameKana:   document.getElementById('fullNameKana').value.trim(),
+        university:     document.getElementById('university').value.trim(),
+        faculty:        document.getElementById('faculty').value.trim(),
+        graduationYear: document.getElementById('graduationYear').value,
+        inviteCode:     document.getElementById('inviteCode').value.trim(),
+        registeredAt:   new Date().toISOString()
+      };
+
+      try {
+        const res = await fetch(GAS_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain' },
+          body: JSON.stringify(payload),
+          redirect: 'follow'
+        });
+
+        document.getElementById('form-screen').style.display   = 'none';
+        document.getElementById('success-screen').classList.add('show');
+      } catch (err) {
+        console.error('Submit error:', err);
+        alert('送信に失敗しました。もう一度お試しください。');
+        btn.disabled = false;
+      } finally {
+        document.getElementById('loading').classList.remove('show');
+      }
+    });
+
+    // =====================================================
+    // LIFF を閉じる
+    // =====================================================
+    function closeLiff() {
+      if (liff.isInClient()) {
+        liff.closeWindow();
+      } else {
+        window.close();
+      }
+    }
+  </script>
+</body>
+</html>
