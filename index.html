@@ -72,6 +72,7 @@
     }
 
     .form-group input[type="text"],
+    .form-group input[type="tel"],
     .form-group select {
       width: 100%;
       padding: 12px 14px;
@@ -230,6 +231,13 @@
         </div>
 
         <div class="form-group">
+          <label>電話番号<span class="required">*必須</span></label>
+          <input type="tel" id="phoneNumber" placeholder="09012345678" inputmode="tel" autocomplete="tel" required>
+          <div class="error-msg" id="phoneNumber-error">電話番号を入力してください</div>
+          <div class="hint">ハイフンなしで入力してください</div>
+        </div>
+
+        <div class="form-group">
           <label>大学名<span class="required">*必須</span></label>
           <input type="text" id="university" placeholder="例：早稲田大学" required>
           <div class="error-msg" id="university-error">大学名を入力してください</div>
@@ -329,17 +337,20 @@
     function validateAll() {
       const name = document.getElementById('fullName').value.trim();
       const kana = document.getElementById('fullNameKana').value.trim();
+      const phone = document.getElementById('phoneNumber').value.trim();
       const uni  = document.getElementById('university').value.trim();
       const fac  = document.getElementById('faculty').value.trim();
       const year = document.getElementById('graduationYear').value;
       const code = document.getElementById('inviteCode').value.trim();
 
       const kanaRegex = /^[ァ-ヶー\s　]+$/;
+      const phoneRegex = /^0\d{9,10}$/;
       const codeRegex = /^[A-Za-z0-9]{3}$/;
 
       let ok = true;
       ok = validateField('fullName',       name.length > 0)                    && ok;
       ok = validateField('fullNameKana',   kanaRegex.test(kana))               && ok;
+      ok = validateField('phoneNumber',    phoneRegex.test(phone))             && ok;
       ok = validateField('university',     uni.length > 0)                     && ok;
       ok = validateField('faculty',        fac.length > 0)                     && ok;
       ok = validateField('graduationYear', year !== '')                         && ok;
@@ -365,6 +376,7 @@
         displayName:    profile ? profile.displayName : '',
         fullName:       document.getElementById('fullName').value.trim(),
         fullNameKana:   document.getElementById('fullNameKana').value.trim(),
+        phoneNumber:    document.getElementById('phoneNumber').value.trim(),
         university:     document.getElementById('university').value.trim(),
         faculty:        document.getElementById('faculty').value.trim(),
         graduationYear: document.getElementById('graduationYear').value,
